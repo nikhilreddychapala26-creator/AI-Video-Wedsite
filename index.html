@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Video Generator</title>
+
+    <style>
+        body {
+            background-color: lightblue;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        h1 {
+            color: navy;
+            font-size: 35px;
+        }
+
+        button {
+            background-color: navy;
+            color: white;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: blue;
+        }
+
+        img {
+            margin: 10px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Aarav's Story</h1>
+
+    <p>
+        In a small village, Aarav, a 12-year-old boy,
+        lives his daily life.
+    </p>
+
+    <p>
+        aarav wears a yellow T-shirt and blue shorts
+        and plays with a red ball outside his home.
+    </p>
+
+    <label for="story">Enter Your Video Story:</label>
+    <br><br>
+
+    <textarea id="story" rows="5" cols="40"
+        placeholder="Type your video story here..."></textarea>
+
+    <br><br>
+
+    <label for="style">Select Video Style:</label>
+    <br><br>
+
+    <select id="style">
+        <option value="cartoon">Cartoon</option>
+        <option value="realistic">Realistic</option>
+        <option value="3d">3D Animation</option>
+        <option value="cinematic">Cinematic</option>
+    </select>
+
+    <h2>Character References</h2>
+
+    <label for="arjunImage">Upload Arjun Character</label>
+    <input type="file" id="arjunImage" accept="image/*">
+
+    <br><br>
+
+    <label for="meenaImage">Upload Meena Character</label>
+    <input type="file" id="meenaImage" accept="image/*">
+
+    <br><br>
+<label for="rohanImage">Upload Rohan Character</label>
+<input type="file" id="rohanImage" accept="image/*">
+<br><br>
+    <label for="motherImage">Upload Mother Character</label>
+    <input type="file" id="motherImage" accept="image/*">
+<br><br>
+
+<label for="aaravImage">Upload Aarav Character</label>
+<input type="file" id="aaravImage" accept="image/*">
+
+<br><br>
+
+<label for="puppyImage">Upload Puppy Character</label>
+<input type="file" id="puppyImage" accept="image/*">
+    <br><br>
+
+    <button id="generateBtn">Generate AI Video</button>
+
+    <h2>Character Image Preview</h2>
+
+    <div id="preview">
+        <h3>Arjun</h3>
+        <img id="arjunPreview" src="" alt="Arjun Preview"
+             style="width:150px; display:none;">
+
+        <h3>Meena</h3>
+        <img id="meenaPreview" src="" alt="Meena Preview"
+             style="width:150px; display:none;">
+
+        <h3>Mother</h3>
+        <img id="motherPreview" src="" alt="Mother Preview"
+             style="width:150px; display:none;">
+             <h3>Rohan</h3>
+<img id="rohanPreview" src="" alt="Rohan Preview"
+     style="width:150px; display:none;">
+
+<h3>Aarav</h3>
+<img id="aaravPreview" src="" alt="Aarav Preview"
+     style="width:150px; display:none;">
+
+<h3>Puppy</h3>
+<img id="puppyPreview" src="" alt="Puppy Preview"
+     style="width:150px; display:none;">
+    </div>
+
+    <p id="status">Your AI Video Studio is ready.</p>
+
+    <script>
+        function showPreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            input.addEventListener("change", function() {
+                const file = this.files[0];
+
+                if (file) {
+                    preview.src = URL.createObjectURL(file);
+                    preview.style.display = "block";
+                }
+            });
+        }
+
+        showPreview("arjunImage", "arjunPreview");
+        showPreview("meenaImage", "meenaPreview");
+        showPreview("motherImage", "motherPreview");
+        showPreview("rohanImage", "rohanPreview");
+showPreview("aaravImage", "aaravPreview");
+showPreview("puppyImage", "puppyPreview");
+
+        document.getElementById("generateBtn").addEventListener("click", function() {
+            const story = document.getElementById("story").value;
+
+            if (story.trim() === "") {
+                alert("Please enter your video story!");
+                return;
+            }
+
+            localStorage.setItem("videoStory", story);
+            window.location.href = "video.html";
+        });
+    </script>
+
+</body>
+</html>
