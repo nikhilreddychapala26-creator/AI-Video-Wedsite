@@ -55,6 +55,4 @@ app.post("/api/story", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
-});
+module.exports = app;
