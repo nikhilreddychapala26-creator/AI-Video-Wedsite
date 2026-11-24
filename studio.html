@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Video Studio — Workspace</title>
+<style>
+:root{color-scheme:dark;--bg:#090d18;--panel:#121a2b;--panel2:#18243a;--line:#263550;--muted:#9baac2;--text:#f4f7ff;--accent:#8b72ff;--cyan:#5bd8e8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 70% -20%,#28366b 0,transparent 42%),var(--bg);color:var(--text);font:15px Inter,Segoe UI,Arial,sans-serif}
+header{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 4vw;background:#0b1120d9;position:sticky;top:0;z-index:3;backdrop-filter:blur(16px)}
+.brand{font-weight:800;letter-spacing:.3px}.brand span{color:var(--cyan)}.top-actions{display:flex;gap:10px;align-items:center}.pill,.btn{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--panel2);color:var(--text);font-weight:650}.btn.primary{background:linear-gradient(110deg,#7659ed,#4d79e9);border:0}.layout{max-width:1440px;margin:auto;padding:28px 4vw 70px;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:22px}
+h1{font-size:clamp(28px,4vw,42px);margin:8px 0}.sub{color:var(--muted);margin:0 0 24px}.panel{background:linear-gradient(150deg,#151f33,#101827);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 16px 45px #0002}.panel h2{font-size:17px;margin:0 0 16px}.eyebrow{font-size:11px;color:var(--cyan);font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+label{display:block;color:#c7d2e5;font-size:13px;margin:14px 0 7px}textarea,input,select{width:100%;background:#0b1322;border:1px solid #2c3b57;border-radius:10px;color:var(--text);padding:12px;font:inherit}textarea{min-height:150px;resize:vertical}textarea:focus,input:focus,select:focus{outline:2px solid #7660e8}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.hint{color:var(--muted);font-size:12px;line-height:1.5}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.actions .btn{cursor:pointer}.preview{min-height:260px;border-radius:14px;border:1px solid #344666;background:linear-gradient(145deg,#182a46,#0d1424 65%);display:grid;place-items:center;text-align:center;padding:22px;overflow:hidden}.preview strong{display:block;font-size:20px;margin:8px}.preview small{color:var(--muted)}.scene{background:#0b1424;border:1px solid var(--line);border-radius:12px;padding:14px}.scene h3{font-size:14px;margin:0 0 7px}.scene p{font-size:13px;color:#bdc9dc;line-height:1.5;margin:0}.scene .tag{color:var(--cyan);font-size:11px;font-weight:800;margin-bottom:8px}.scene-list{display:grid;gap:10px}.status{margin-top:12px;color:var(--cyan);font-size:13px;min-height:20px}.disabled-note{border:1px dashed #3c4b67;border-radius:12px;padding:14px;color:var(--muted);font-size:13px;line-height:1.5}.rightcol{position:sticky;top:92px;align-self:start}.bar{height:6px;background:#26344d;border-radius:8px;overflow:hidden;margin:12px 0}.bar span{display:block;width:18%;height:100%;background:linear-gradient(90deg,var(--accent),var(--cyan))}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.rightcol{position:static}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}header{padding:0 18px}}
+</style>
+</head>
+<body>
+<header><div class="brand">✦ AI VIDEO <span>STUDIO</span></div><div class="top-actions"><span class="pill">Workspace · Preview</span><a class="btn" href="index.html" style="text-decoration:none">Home</a></div></header>
+<main class="layout">
+<section>
+<div class="eyebrow">Your creative production suite</div><h1>Turn stories into cinema.</h1><p class="sub">Plan a film, shape every scene, and prepare assets for a YouTube-ready production.</p>
+<div class="panel">
+<h2>01 · Story & concept</h2>
+<label for="story">Your story or video idea</label>
+<textarea id="story" placeholder="Example: A young village inventor discovers a mysterious light in an abandoned observatory..."></textarea>
+<div class="grid2"><div><label for="genre">Genre</label><select id="genre"><option>Cinematic adventure</option><option>Science fiction</option><option>Fantasy</option><option>Documentary</option><option>Kids animation</option><option>Drama</option></select></div><div><label for="look">Visual direction</label><select id="look"><option>IMAX-inspired cinematic</option><option>Photorealistic film</option><option>Stylized 3D animation</option><option>Documentary realism</option></select></div></div>
+<div class="actions"><button class="btn primary" id="outlineBtn">Create scene outline</button><button class="btn" id="clearBtn">Clear</button></div><div class="status" id="storyStatus" aria-live="polite"></div>
+<p class="hint">This first workspace creates a local scene outline from your text. AI-generated scripts and video clips will be connected after the provider and rendering integrations are implemented.</p>
+</div>
+<div class="panel"><h2>02 · Storyboard & scene plan</h2><div id="scenes" class="scene-list"><div class="disabled-note">Your scene cards will appear here after you create an outline.</div></div></div>
+<div class="panel"><h2>03 · Production assets</h2><div class="grid2"><div><label for="character">Character reference image</label><input id="character" type="file" accept="image/*"><p class="hint">Upload a reference to plan consistent character appearance.</p></div><div><label for="music">Music / sound reference</label><input id="music" type="file" accept="audio/*"><p class="hint">Audio preview and mixing will be added in the editing phase.</p></div></div></div>
+</section>
+<aside class="rightcol">
+<div class="panel"><div class="eyebrow">Film preview</div><h2 style="margin-top:8px">Creative canvas</h2><div class="preview" id="preview"><div><div style="font-size:38px">▧</div><strong>Your film starts here</strong><small>Scene visual previews appear when an image/video provider is connected.</small></div></div><div class="bar"><span></span></div><p class="hint">Workspace foundation · AI rendering not connected yet</p></div>
+<div class="panel"><h2>04 · YouTube delivery</h2><label for="format">Video format</label><select id="format"><option value="16:9">YouTube — 16:9 landscape</option><option value="9:16">YouTube Shorts — 9:16 vertical</option><option value="1:1">Square — 1:1</option></select><label for="duration">Target duration</label><select id="duration"><option>30–60 seconds</option><option>1–3 minutes</option><option>5–10 minutes</option><option>10–20 minutes</option><option>Feature-length</option></select><label for="thumbnail">Thumbnail concept</label><textarea id="thumbnail" placeholder="A dramatic close-up, strong emotion, cinematic lighting... " style="min-height:85px"></textarea><button class="btn" id="thumbnailBtn" style="width:100%;margin-top:12px">Prepare thumbnail brief</button><div id="thumbStatus" class="status" aria-live="polite"></div><div class="disabled-note" style="margin-top:14px">MP4 export, thumbnail image generation, captions, voice-over, and YouTube publishing will be enabled after their respective rendering and account integrations are connected. No fake export is shown here.</div></div>
+</aside>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+$("outlineBtn").addEventListener("click",()=>{
+ const raw=$("story").value.trim(); if(!raw){$("storyStatus").textContent="Enter a story or idea first.";return;}
+ const chunks=raw.split(/(?<=[.!?])\s+|\n+/).map(s=>s.trim()).filter(Boolean);
+ const parts=chunks.length>1?chunks:[raw];
+ const scenes=parts.slice(0,12);
+ $("scenes").innerHTML="";
+ scenes.forEach((line,i)=>{const card=document.createElement("article");card.className="scene";const tag=document.createElement("div");tag.className="tag";tag.textContent="SCENE "+String(i+1).padStart(2,"0");const title=document.createElement("h3");title.textContent=["Opening / Establishing shot","Setup / Character moment","Rising action","Key reveal","Climax","Resolution"][Math.min(i,5)];const p=document.createElement("p");p.textContent=line;card.append(tag,title,p);$("scenes").append(card);});
+ $("storyStatus").textContent="Created "+scenes.length+" scene card(s) from your text. These are planning cards, not rendered video clips.";
+});
+$("clearBtn").addEventListener("click",()=>{$("story").value="";$("scenes").innerHTML='<div class="disabled-note">Your scene cards will appear here after you create an outline.</div>';$("storyStatus").textContent="Story cleared.";});
+$("thumbnailBtn").addEventListener("click",()=>{const idea=$("thumbnail").value.trim();if(!idea){$("thumbStatus").textContent="Add a thumbnail concept first.";return;}const brief="YouTube thumbnail brief — 16:9, one clear focal subject, strong readable emotion, high contrast, cinematic lighting. Concept: "+idea;$("thumbStatus").textContent="Thumbnail brief prepared: "+brief;});
+</script>
+</body></html>
