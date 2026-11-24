@@ -1,89 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Video Studio</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { background: #e7f3ff; font-family: Arial, sans-serif; text-align: center; padding: 35px 16px; color: #14264b; }
-        main { max-width: 760px; margin: auto; padding: 28px; background: white; border-radius: 16px; box-shadow: 0 8px 28px #19335b20; }
-        textarea, select { max-width: 100%; padding: 12px; border: 1px solid #9aacc4; border-radius: 8px; font-size: 16px; }
-        button { background: navy; color: white; padding: 15px 30px; font-size: 18px; border: none; border-radius: 10px; cursor: pointer; }
-        button:hover { background: #244a9b; }
-        .character { margin: 12px 0; }
-        .character img { display: none; width: 130px; max-height: 160px; object-fit: contain; margin: 8px; border-radius: 10px; }
-        #status { min-height: 24px; }
-    </style>
-</head>
-<body>
-<main>
-    <h1>AI Video Studio</h1>
-    <p>Start with a story idea. You can add character reference images for planning.</p>
-
-    <label for="story">Enter Your Video Story:</label><br><br>
-    <textarea id="story" rows="5" cols="48" placeholder="Type your video story here..."></textarea><br><br>
-
-    <label for="style">Select Story Style:</label><br><br>
-    <select id="style">
-        <option value="animation">3D Animation</option>
-        <option value="cinematic">Cinematic</option>
-        <option value="realistic">Realistic</option>
-        <option value="documentary">Documentary</option>
-    </select>
-
-    <h2>Character References (Preview Only)</h2>
-    <p>Choose images to preview them on this page. They are not sent to Gemini yet.</p>
-    <div class="character"><label for="arjunImage">Arjun</label><input type="file" id="arjunImage" accept="image/*"><br><img id="arjunPreview" alt="Arjun preview"></div>
-    <div class="character"><label for="meenaImage">Meena</label><input type="file" id="meenaImage" accept="image/*"><br><img id="meenaPreview" alt="Meena preview"></div>
-    <div class="character"><label for="rohanImage">Rohan</label><input type="file" id="rohanImage" accept="image/*"><br><img id="rohanPreview" alt="Rohan preview"></div>
-    <div class="character"><label for="motherImage">Mother</label><input type="file" id="motherImage" accept="image/*"><br><img id="motherPreview" alt="Mother preview"></div>
-    <div class="character"><label for="aaravImage">Aarav</label><input type="file" id="aaravImage" accept="image/*"><br><img id="aaravPreview" alt="Aarav preview"></div>
-    <div class="character"><label for="puppyImage">Puppy</label><input type="file" id="puppyImage" accept="image/*"><br><img id="puppyPreview" alt="Puppy preview"></div>
-
-    <br><button id="generateBtn" type="button">Continue to Story Studio</button>
-    <p id="status" role="status" aria-live="polite">Your AI Video Studio is ready.</p>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Video Studio</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:28px 16px;background:#eaf1ff;color:#172342;font-family:Arial,sans-serif}
+main{max-width:900px;margin:auto;padding:28px;background:white;border-radius:18px;box-shadow:0 8px 28px #19335b20}
+h1,h2{text-align:center}label{display:block;font-weight:600;margin:16px 0 8px}
+textarea,input,select{width:100%;padding:12px;border:1px solid #aab8d0;border-radius:8px;font:inherit}
+textarea{min-height:130px;resize:vertical}button{border:0;border-radius:9px;padding:13px 18px;background:#273f91;color:white;font-size:16px;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.actions button{flex:1}
+#status{min-height:24px;color:#405276;line-height:1.5}.hint{color:#65718a;line-height:1.5}
+#characters{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
+.character{border:1px solid #d8e0ef;border-radius:12px;padding:15px;background:#f8faff}
+.character h3{margin:0 0 6px}.character p{line-height:1.45;margin:6px 0}.character img{display:none;width:100%;height:190px;object-fit:contain;background:#edf1f8;border-radius:8px;margin-top:10px}
+.small{font-size:13px;color:#65718a}
+</style></head>
+<body><main>
+<h1>AI Video Studio</h1>
+<p class="hint">Create original characters from any story. There are no fixed character names or preset cast.</p>
+<label for="story">Your Story or Idea</label>
+<textarea id="story" placeholder="Example: A young inventor and a talking cloud travel across a floating city..."></textarea>
+<label for="style">Visual Style</label>
+<select id="style"><option value="animation">High-quality 3D Animation</option><option value="cinematic">Cinematic</option><option value="realistic">Realistic</option><option value="documentary">Documentary</option></select>
+<div class="actions"><button id="createBtn">Create Characters from My Story</button><button id="addBtn" type="button">Add Character Manually</button></div>
+<p id="status" role="status" aria-live="polite">Enter any story, then create its character cast.</p>
+<h2>Character Studio</h2>
+<p class="hint">The AI will identify characters in your story and create individual visual descriptions. You can edit names and descriptions or attach your own reference image.</p>
+<div id="characters"></div>
 </main>
 <script>
-    function showPreview(inputId, previewId) {
-        const input = document.getElementById(inputId);
-        const preview = document.getElementById(previewId);
-        let previousUrl;
-        input.addEventListener("change", function () {
-            if (previousUrl) URL.revokeObjectURL(previousUrl);
-            const file = this.files && this.files[0];
-            if (!file) {
-                preview.removeAttribute("src");
-                preview.style.display = "none";
-                return;
-            }
-            if (!file.type.startsWith("image/")) {
-                document.getElementById("status").textContent = "Please choose an image file.";
-                input.value = "";
-                return;
-            }
-            previousUrl = URL.createObjectURL(file);
-            preview.src = previousUrl;
-            preview.style.display = "inline-block";
-        });
-    }
-
-    ["arjun", "meena", "rohan", "mother", "aarav", "puppy"].forEach(name => {
-        showPreview(name + "Image", name + "Preview");
-    });
-
-    document.getElementById("generateBtn").addEventListener("click", function () {
-        const story = document.getElementById("story").value.trim();
-        const style = document.getElementById("style").value;
-        if (!story) {
-            document.getElementById("status").textContent = "Please enter your story idea first.";
-            document.getElementById("story").focus();
-            return;
-        }
-        localStorage.setItem("videoStory", story);
-        localStorage.setItem("videoStyle", style);
-        window.location.href = "video.html";
-    });
-</script>
-</body>
-</html>
+const story=document.getElementById("story"),list=document.getElementById("characters"),status=document.getElementById("status"),createBtn=document.getElementById("createBtn");
+const saved=localStorage.getItem("videoStory");if(saved)story.value=saved;
+function addCharacter(c={}) {
+ const card=document.createElement("article");card.className="character";
+ const name=document.createElement("input");name.placeholder="Character name";name.value=c.name||"";
+ const role=document.createElement("input");role.placeholder="Role in story";role.value=c.role||"";
+ const age=document.createElement("input");age.placeholder="Age / age range";age.value=c.age||"";
+ const appearance=document.createElement("textarea");appearance.placeholder="Appearance and visual identity";appearance.value=c.appearance||"";
+ const clothing=document.createElement("textarea");clothing.placeholder="Clothing and accessories";clothing.value=c.clothing||"";
+ const personality=document.createElement("textarea");personality.placeholder="Personality";personality.value=c.personality||"";
+ const upload=document.createElement("input");upload.type="file";upload.accept="image/*";
+ const img=document.createElement("img");img.alt="Character reference preview";
+ upload.addEventListener("change",()=>{const f=upload.files&&upload.files[0];if(!f)return;if(!f.type.startsWith("image/")){status.textContent="Choose a valid image file.";upload.value="";return;}img.src=URL.createObjectURL(f);img.style.display="block";});
+ const title=document.createElement("h3");title.textContent=c.name||"New Character";
+ name.addEventListener("input",()=>title.textContent=name.value||"New Character");
+ const remove=document.createElement("button");remove.type="button";remove.textContent="Remove Character";remove.addEventListener("click",()=>card.remove());
+ card.append(title,name,role,age,appearance,clothing,personality);
+ const lab=document.createElement("p");lab.className="small";lab.textContent="Optional reference image (preview only)";
+ card.append(lab,upload,img,remove);list.append(card);
+}
+document.getElementById("addBtn").addEventListener("click",()=>addCharacter());
+createBtn.addEventListener("click",async()=>{
+ const topic=story.value.trim();if(!topic){status.textContent="Please enter a story idea first.";story.focus();return;}
+ createBtn.disabled=true;createBtn.textContent="Creating your cast...";
+ status.textContent="Reading your story and designing original characters...";
+ try{
+  const response=await fetch("/api/characters",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({story:topic,style:document.getElementById("style").value})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||"Character creation failed (HTTP "+response.status+").");
+  list.replaceChildren();data.characters.forEach(addCharacter);
+  localStorage.setItem("videoStory",topic);localStorage.setItem("videoCharacters",JSON.stringify(data.characters));
+  status.textContent="Created "+data.characters.length+" story-specific character profiles. Edit them or add more below.";
+ }catch(e){status.textContent="Character creation failed: "+e.message;}
+ finally{createBtn.disabled=false;createBtn.textContent="Create Characters from My Story";}
+});
+try{const old=JSON.parse(localStorage.getItem("videoCharacters")||"[]");if(Array.isArray(old))old.forEach(addCharacter);}catch{}
+</script></body></html>
