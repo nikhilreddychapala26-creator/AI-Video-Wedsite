@@ -28,6 +28,12 @@ button:disabled{opacity:.6;cursor:wait}.actions{display:flex;gap:10px;flex-wrap:
 <h2>Character Studio</h2>
 <p class="hint">The AI will identify characters in your story and create individual visual descriptions. You can edit names and descriptions or attach your own reference image.</p>
 <div id="characters"></div>
+<div class="actions" style="margin-top:22px"><button id="generateScenesBtn" type="button">Generate Story Scenes</button></div>
+<section id="scenesSection" hidden style="margin-top:24px">
+  <h2>Your Story Scenes</h2>
+  <p class="hint">AI-generated scene plan based on your story and character profiles. Review and edit your story before using it for video production.</p>
+  <pre id="sceneOutput" style="white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7ff;border:1px solid #d8e0ef;border-radius:12px;padding:18px;line-height:1.6;font:inherit"></pre>
+</section>
 </main>
 <script>
 const story=document.getElementById("story"),list=document.getElementById("characters"),status=document.getElementById("status"),createBtn=document.getElementById("createBtn");
@@ -66,4 +72,40 @@ createBtn.addEventListener("click",async()=>{
  finally{createBtn.disabled=false;createBtn.textContent="Create Characters from My Story";}
 });
 try{const old=JSON.parse(localStorage.getItem("videoCharacters")||"[]");if(Array.isArray(old))old.forEach(addCharacter);}catch{}
+
+document.getElementById("generateScenesBtn").addEventListener("click", async () => {
+ const topic = story.value.trim();
+ if (!topic) { status.textContent = "Please enter your story first."; story.focus(); return; }
+ const cards = [...list.querySelectorAll(".character")];
+ const characters = cards.map(card => {
+  const fields = [...card.querySelectorAll("input:not([type=file]), textarea")];
+  return { name: fields[0]?.value.trim() || "", role: fields[1]?.value.trim() || "", age: fields[2]?.value.trim() || "", appearance: fields[3]?.value.trim() || "", clothing: fields[4]?.value.trim() || "", personality: fields[5]?.value.trim() || "" };
+ }).filter(c => c.name || c.role || c.appearance);
+ if (!characters.length) { status.textContent = "Create your characters first, then generate story scenes."; return; }
+ const button = document.getElementById("generateScenesBtn");
+ const output = document.getElementById("sceneOutput");
+ const section = document.getElementById("scenesSection");
+ button.disabled = true; button.textContent = "Generating Story Scenes...";
+ status.textContent = "Building your scene-by-scene story using your character profiles...";
+ section.hidden = false; output.textContent = "Generating scenes. Please wait...";
+ const characterNotes = characters.map((c,i) => `Character ${i+1}: ${c.name}; role: ${c.role}; age: ${c.age}; appearance: ${c.appearance}; clothing: ${c.clothing}; personality: ${c.personality}`).join("\\n");
+ const topicWithCast = topic + "\\n\\nUse these exact story character profiles and keep their names and visual identities consistent in every scene:\\n" + characterNotes;
+ try {
+  const response = await fetch("/api/story", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({topic:topicWithCast,style:document.getElementById("style").value}) });
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok) throw new Error(data.error || "Scene generation failed (HTTP " + response.status + ").");
+  if (!data.story) throw new Error("The AI returned an empty scene plan. Please try again.");
+  output.textContent = data.story;
+  localStorage.setItem("videoStoryScenes", data.story);
+  status.textContent = "Your story scenes were generated successfully. Review the scene plan below.";
+  section.scrollIntoView({behavior:"smooth",block:"start"});
+ } catch (error) {
+  output.textContent = "Could not generate scenes: " + error.message;
+  status.textContent = "Scene generation failed. Check the message below and try again.";
+ } finally {
+  button.disabled = false; button.textContent = "Generate Story Scenes";
+ }
+});
+const savedScenes = localStorage.getItem("videoStoryScenes");
+if (savedScenes) { document.getElementById("sceneOutput").textContent = savedScenes; document.getElementById("scenesSection").hidden = false; }
 </script></body></html>
