@@ -21,16 +21,42 @@ module.exports = async function handleStory(req, res) {
         });
     }
 
-    const prompt = `Create a detailed ${style} video story from this idea:
+    const prompt = `You are a professional animation film director, character-continuity supervisor, and storyboard artist.
+
+Create a complete, polished, production-ready scene plan for this story in the requested ${style} visual style.
+
+STORY AND CHARACTER PROFILES:
 ${topic}
 
-Break the story into clearly numbered scenes. For each scene include:
-- Scene number and short title
-- Location and time of day
-- Visual action and camera direction
-- Character emotions and dialogue where appropriate
-- Short narration
-Keep every character name and core appearance details consistent across scenes. Return a clear, production-ready scene plan.`;
+NON-NEGOTIABLE CHARACTER IDENTITY LOCK:
+1. Treat every supplied character profile as the canonical design sheet.
+2. A character's face must remain exactly the same in every scene and shot: same facial structure, eye shape and color, nose, mouth, skin/fur tone, hairstyle, hair color, age appearance, body proportions, and distinctive marks/accessories.
+3. Never redesign, age up/down, beautify, or randomly alter a character. Never change a character's species or defining physical traits.
+4. Repeat a concise but specific identity description for each visible character in every scene prompt, using the supplied profile. Do not rely on phrases such as "same character as before" alone.
+5. If a detail is not supplied, choose it once in a Character Continuity Bible and keep it unchanged throughout the story.
+
+WARDROBE AND LOCATION CONTINUITY:
+1. Clothing is allowed to change when the story moves to a different day, season, weather, activity, or location and a change makes practical story sense.
+2. A wardrobe change must never change the character's face, hair, age, body, or identity.
+3. Create a clear wardrobe plan: specify the outfit for each story day/location, explain why it changes, and keep that outfit identical across all scenes taking place in the same continuous time period.
+4. If the story does not justify a clothing change, keep the outfit unchanged. Do not change clothes randomly between adjacent shots.
+5. Keep props, bags, tools, and carried objects consistent. Track when an item is picked up, used, handed over, or put away.
+6. Keep geography, weather, time of day, lighting direction, and screen direction coherent between connected scenes. Show believable transitions when time or place changes.
+
+SCENE PLAN REQUIREMENTS:
+- First provide a Character Continuity Bible for every important character: exact face and physical identity, hair, age appearance, body proportions, signature details, and default outfit.
+- Then provide a Day / Location / Wardrobe Continuity Schedule. Clearly state which outfit is used on each day or location and why any change is needed.
+- Then create a logical scene-by-scene storyboard. Include as many scenes as the story needs; do not force the story into six scenes if its length requires more or fewer.
+- For every scene include: scene number and title; story day and elapsed time; location and time of day; weather and lighting; characters present; each character's exact identity lock and that scene's outfit; action and emotional performance; camera shot, angle, movement and framing; dialogue; narration; props and continuity notes; and a transition to the next scene.
+- Make each scene visually specific and suitable for generating an individual image or video clip.
+- Keep dialogue natural and avoid repeating the same information in narration.
+- Preserve the user's original story events, character names, relationships, and intended ending. Do not invent unrelated characters or change the plot.
+- Ensure every important character in the supplied profiles has a meaningful role where the story allows. Do not insert a character into a scene without a story reason.
+- End with a final production checklist for face consistency, wardrobe continuity, props, locations, and scene transitions.
+
+IMPORTANT: A written prompt can strongly guide visual consistency but cannot guarantee identical faces in generated images or videos. The plan must therefore include explicit reference-image instructions for each character wherever the video-generation workflow supports reference images.
+
+Return a clean, well-organized scene plan with readable headings and no raw JSON.`;
 
     let lastError = null;
     for (const model of [...new Set(FALLBACK_MODELS)]) {
