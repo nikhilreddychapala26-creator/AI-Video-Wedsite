@@ -25,7 +25,7 @@ label{display:block;color:#c7d2e5;font-size:13px;margin:14px 0 7px}textarea,inpu
 <label for="story">Your story or video idea</label>
 <textarea id="story" placeholder="Example: A young village inventor discovers a mysterious light in an abandoned observatory..."></textarea>
 <div class="grid2"><div><label for="genre">Genre</label><select id="genre"><option>Cinematic adventure</option><option>Science fiction</option><option>Fantasy</option><option>Documentary</option><option>Kids animation</option><option>Drama</option></select></div><div><label for="look">Visual direction</label><select id="look"><option>IMAX-inspired cinematic</option><option>Photorealistic film</option><option>Stylized 3D animation</option><option>Documentary realism</option></select></div></div>
-<div class="actions"><button class="btn primary" id="outlineBtn">Create scene outline</button><button class="btn" id="clearBtn">Clear</button></div><div class="status" id="storyStatus" aria-live="polite"></div>
+<div class="actions"><button class="btn primary" id="outlineBtn">Generate AI scene outline</button><button class="btn" id="clearBtn">Clear</button></div><div class="status" id="storyStatus" aria-live="polite"></div>
 <p class="hint">This first workspace creates a local scene outline from your text. AI-generated scripts and video clips will be connected after the provider and rendering integrations are implemented.</p>
 </div>
 <div class="panel"><h2>02 · Storyboard & scene plan</h2><div id="scenes" class="scene-list"><div class="disabled-note">Your scene cards will appear here after you create an outline.</div></div></div>
@@ -38,14 +38,30 @@ label{display:block;color:#c7d2e5;font-size:13px;margin:14px 0 7px}textarea,inpu
 </main>
 <script>
 const $=id=>document.getElementById(id);
-$("outlineBtn").addEventListener("click",()=>{
- const raw=$("story").value.trim(); if(!raw){$("storyStatus").textContent="Enter a story or idea first.";return;}
- const chunks=raw.split(/(?<=[.!?])\s+|\n+/).map(s=>s.trim()).filter(Boolean);
- const parts=chunks.length>1?chunks:[raw];
- const scenes=parts.slice(0,12);
- $("scenes").innerHTML="";
- scenes.forEach((line,i)=>{const card=document.createElement("article");card.className="scene";const tag=document.createElement("div");tag.className="tag";tag.textContent="SCENE "+String(i+1).padStart(2,"0");const title=document.createElement("h3");title.textContent=["Opening / Establishing shot","Setup / Character moment","Rising action","Key reveal","Climax","Resolution"][Math.min(i,5)];const p=document.createElement("p");p.textContent=line;card.append(tag,title,p);$("scenes").append(card);});
- $("storyStatus").textContent="Created "+scenes.length+" scene card(s) from your text. These are planning cards, not rendered video clips.";
+$("outlineBtn").addEventListener("click",async()=>{
+ const topic=$("story").value.trim();
+ if(!topic){$("storyStatus").textContent="Enter a story or idea first.";return;}
+ const button=$("outlineBtn");button.disabled=true;button.textContent="Generating...";
+ $("storyStatus").textContent="Sending your story to the configured AI story service...";
+ try{
+  const response=await fetch("/api/story",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic,style:$("look").value})});
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||"Story generation failed. Please try again.");
+  const generated=(data.story||"").trim();
+  if(!generated)throw new Error("The AI service returned an empty result.");
+  const lines=generated.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const sceneLines=lines.filter(s=>/^(scene\s*\d+|\d+[.)]|\*\*scene)/i.test(s));
+  const cards=(sceneLines.length?sceneLines:lines).slice(0,16);
+  $("scenes").innerHTML="";
+  cards.forEach((line,i)=>{
+   const card=document.createElement("article");card.className="scene";
+   const tag=document.createElement("div");tag.className="tag";tag.textContent="AI STORY · "+String(i+1).padStart(2,"0");
+   const p=document.createElement("p");p.textContent=line.replace(/^[-*#\s]+/,"");
+   card.append(tag,p);$("scenes").append(card);
+  });
+  $("storyStatus").textContent="AI story response received and split into planning cards. No video clips have been rendered.";
+ }catch(error){$("storyStatus").textContent=error.message+" Check that the server is running and GEMINI_API_KEY is configured.";}
+ finally{button.disabled=false;button.textContent="Generate AI scene outline";}
 });
 $("clearBtn").addEventListener("click",()=>{$("story").value="";$("scenes").innerHTML='<div class="disabled-note">Your scene cards will appear here after you create an outline.</div>';$("storyStatus").textContent="Story cleared.";});
 $("thumbnailBtn").addEventListener("click",()=>{const idea=$("thumbnail").value.trim();if(!idea){$("thumbStatus").textContent="Add a thumbnail concept first.";return;}const brief="YouTube thumbnail brief — 16:9, one clear focal subject, strong readable emotion, high contrast, cinematic lighting. Concept: "+idea;$("thumbStatus").textContent="Thumbnail brief prepared: "+brief;});
