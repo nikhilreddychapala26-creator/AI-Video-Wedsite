@@ -1,3 +1,3 @@
+const handleStory = require("../story-handler");
 
-javascript const { app } = require("../server");
- module.exports = async (req, res) => { app(req, res); };
+module.exports = handleStory;
