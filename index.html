@@ -1,168 +1,89 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI Video Generator</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Studio</title>
     <style>
-        body {
-            background-color: lightblue;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 50px;
-        }
-
-        h1 {
-            color: navy;
-            font-size: 35px;
-        }
-
-        button {
-            background-color: navy;
-            color: white;
-            padding: 15px 30px;
-            font-size: 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: blue;
-        }
-
-        img {
-            margin: 10px;
-            border-radius: 10px;
-        }
+        * { box-sizing: border-box; }
+        body { background: #e7f3ff; font-family: Arial, sans-serif; text-align: center; padding: 35px 16px; color: #14264b; }
+        main { max-width: 760px; margin: auto; padding: 28px; background: white; border-radius: 16px; box-shadow: 0 8px 28px #19335b20; }
+        textarea, select { max-width: 100%; padding: 12px; border: 1px solid #9aacc4; border-radius: 8px; font-size: 16px; }
+        button { background: navy; color: white; padding: 15px 30px; font-size: 18px; border: none; border-radius: 10px; cursor: pointer; }
+        button:hover { background: #244a9b; }
+        .character { margin: 12px 0; }
+        .character img { display: none; width: 130px; max-height: 160px; object-fit: contain; margin: 8px; border-radius: 10px; }
+        #status { min-height: 24px; }
     </style>
 </head>
-
 <body>
+<main>
+    <h1>AI Video Studio</h1>
+    <p>Start with a story idea. You can add character reference images for planning.</p>
 
-    <h1>Aarav's Story</h1>
+    <label for="story">Enter Your Video Story:</label><br><br>
+    <textarea id="story" rows="5" cols="48" placeholder="Type your video story here..."></textarea><br><br>
 
-    <p>
-        In a small village, Aarav, a 12-year-old boy,
-        lives his daily life.
-    </p>
-
-    <p>
-        aarav wears a yellow T-shirt and blue shorts
-        and plays with a red ball outside his home.
-    </p>
-
-    <label for="story">Enter Your Video Story:</label>
-    <br><br>
-
-    <textarea id="story" rows="5" cols="40"
-        placeholder="Type your video story here..."></textarea>
-
-    <br><br>
-
-    <label for="style">Select Video Style:</label>
-    <br><br>
-
+    <label for="style">Select Story Style:</label><br><br>
     <select id="style">
-        <option value="cartoon">Cartoon</option>
-        <option value="realistic">Realistic</option>
-        <option value="3d">3D Animation</option>
+        <option value="animation">3D Animation</option>
         <option value="cinematic">Cinematic</option>
+        <option value="realistic">Realistic</option>
+        <option value="documentary">Documentary</option>
     </select>
 
-    <h2>Character References</h2>
+    <h2>Character References (Preview Only)</h2>
+    <p>Choose images to preview them on this page. They are not sent to Gemini yet.</p>
+    <div class="character"><label for="arjunImage">Arjun</label><input type="file" id="arjunImage" accept="image/*"><br><img id="arjunPreview" alt="Arjun preview"></div>
+    <div class="character"><label for="meenaImage">Meena</label><input type="file" id="meenaImage" accept="image/*"><br><img id="meenaPreview" alt="Meena preview"></div>
+    <div class="character"><label for="rohanImage">Rohan</label><input type="file" id="rohanImage" accept="image/*"><br><img id="rohanPreview" alt="Rohan preview"></div>
+    <div class="character"><label for="motherImage">Mother</label><input type="file" id="motherImage" accept="image/*"><br><img id="motherPreview" alt="Mother preview"></div>
+    <div class="character"><label for="aaravImage">Aarav</label><input type="file" id="aaravImage" accept="image/*"><br><img id="aaravPreview" alt="Aarav preview"></div>
+    <div class="character"><label for="puppyImage">Puppy</label><input type="file" id="puppyImage" accept="image/*"><br><img id="puppyPreview" alt="Puppy preview"></div>
 
-    <label for="arjunImage">Upload Arjun Character</label>
-    <input type="file" id="arjunImage" accept="image/*">
-
-    <br><br>
-
-    <label for="meenaImage">Upload Meena Character</label>
-    <input type="file" id="meenaImage" accept="image/*">
-
-    <br><br>
-<label for="rohanImage">Upload Rohan Character</label>
-<input type="file" id="rohanImage" accept="image/*">
-<br><br>
-    <label for="motherImage">Upload Mother Character</label>
-    <input type="file" id="motherImage" accept="image/*">
-<br><br>
-
-<label for="aaravImage">Upload Aarav Character</label>
-<input type="file" id="aaravImage" accept="image/*">
-
-<br><br>
-
-<label for="puppyImage">Upload Puppy Character</label>
-<input type="file" id="puppyImage" accept="image/*">
-    <br><br>
-
-    <button id="generateBtn">Generate AI Video</button>
-
-    <h2>Character Image Preview</h2>
-
-    <div id="preview">
-        <h3>Arjun</h3>
-        <img id="arjunPreview" src="" alt="Arjun Preview"
-             style="width:150px; display:none;">
-
-        <h3>Meena</h3>
-        <img id="meenaPreview" src="" alt="Meena Preview"
-             style="width:150px; display:none;">
-
-        <h3>Mother</h3>
-        <img id="motherPreview" src="" alt="Mother Preview"
-             style="width:150px; display:none;">
-             <h3>Rohan</h3>
-<img id="rohanPreview" src="" alt="Rohan Preview"
-     style="width:150px; display:none;">
-
-<h3>Aarav</h3>
-<img id="aaravPreview" src="" alt="Aarav Preview"
-     style="width:150px; display:none;">
-
-<h3>Puppy</h3>
-<img id="puppyPreview" src="" alt="Puppy Preview"
-     style="width:150px; display:none;">
-    </div>
-
-    <p id="status">Your AI Video Studio is ready.</p>
-
-    <script>
-        function showPreview(inputId, previewId) {
-            const input = document.getElementById(inputId);
-            const preview = document.getElementById(previewId);
-
-            input.addEventListener("change", function() {
-                const file = this.files[0];
-
-                if (file) {
-                    preview.src = URL.createObjectURL(file);
-                    preview.style.display = "block";
-                }
-            });
-        }
-
-        showPreview("arjunImage", "arjunPreview");
-        showPreview("meenaImage", "meenaPreview");
-        showPreview("motherImage", "motherPreview");
-        showPreview("rohanImage", "rohanPreview");
-showPreview("aaravImage", "aaravPreview");
-showPreview("puppyImage", "puppyPreview");
-
-        document.getElementById("generateBtn").addEventListener("click", function() {
-            const story = document.getElementById("story").value;
-
-            if (story.trim() === "") {
-                alert("Please enter your video story!");
+    <br><button id="generateBtn" type="button">Continue to Story Studio</button>
+    <p id="status" role="status" aria-live="polite">Your AI Video Studio is ready.</p>
+</main>
+<script>
+    function showPreview(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        let previousUrl;
+        input.addEventListener("change", function () {
+            if (previousUrl) URL.revokeObjectURL(previousUrl);
+            const file = this.files && this.files[0];
+            if (!file) {
+                preview.removeAttribute("src");
+                preview.style.display = "none";
                 return;
             }
-
-            localStorage.setItem("videoStory", story);
-            window.location.href = "video.html";
+            if (!file.type.startsWith("image/")) {
+                document.getElementById("status").textContent = "Please choose an image file.";
+                input.value = "";
+                return;
+            }
+            previousUrl = URL.createObjectURL(file);
+            preview.src = previousUrl;
+            preview.style.display = "inline-block";
         });
-    </script>
+    }
 
+    ["arjun", "meena", "rohan", "mother", "aarav", "puppy"].forEach(name => {
+        showPreview(name + "Image", name + "Preview");
+    });
+
+    document.getElementById("generateBtn").addEventListener("click", function () {
+        const story = document.getElementById("story").value.trim();
+        const style = document.getElementById("style").value;
+        if (!story) {
+            document.getElementById("status").textContent = "Please enter your story idea first.";
+            document.getElementById("story").focus();
+            return;
+        }
+        localStorage.setItem("videoStory", story);
+        localStorage.setItem("videoStyle", style);
+        window.location.href = "video.html";
+    });
+</script>
 </body>
 </html>
