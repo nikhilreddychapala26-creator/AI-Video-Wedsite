@@ -1,3 +1,2 @@
-
-javascript const { app } = require("../server");
- module.exports = async (req, res) => { app(req, res); };
+// Serverless entry point: reuse the Express application and its /api/story route.
+module.exports = require("../server");
