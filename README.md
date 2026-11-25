@@ -32,7 +32,7 @@ Open `studio.html` through the Express app to use the workspace.
 4. Download the starter model once:
 
    ```bash
-   ollama pull llama3.2:3b
+   ollama pull tinyllama
    ```
 
 5. Make sure Ollama is running, then start the website:
@@ -43,7 +43,7 @@ Open `studio.html` through the Express app to use the workspace.
 
 6. Open `http://localhost:3000/studio.html` (or the port printed by the server).
 
-The local configuration uses `AI_PROVIDER=ollama` and sends story requests to `OLLAMA_BASE_URL`. Change `OLLAMA_MODEL` if you install a different model.
+The local configuration uses `AI_PROVIDER=ollama` and `OLLAMA_MODEL=tinyllama`, matching the starter model used in the setup steps. Change `OLLAMA_MODEL` if you install a different model.
 
 ## Use Gemini instead
 
