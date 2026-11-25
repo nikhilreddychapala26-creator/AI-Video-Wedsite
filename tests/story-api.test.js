@@ -19,7 +19,7 @@ test("story API integration checks", async (t) => {
   });
 
   await t.test("health endpoint reports the selected provider", async () => {
-    const response = await fetch(`${base}/health`);
+    const response = await originalFetch(`${base}/health`);
     assert.equal(response.status, 200);
     assert.deepEqual(await response.json(), {
       ok: true,
@@ -29,7 +29,7 @@ test("story API integration checks", async (t) => {
   });
 
   await t.test("empty story is rejected", async () => {
-    const response = await fetch(`${base}/api/story`, {
+    const response = await originalFetch(`${base}/api/story`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ topic: "   " })
@@ -48,7 +48,7 @@ test("story API integration checks", async (t) => {
       }), { status: 200, headers: { "content-type": "application/json" } });
     };
 
-    const response = await fetch(`${base}/api/story`, {
+    const response = await originalFetch(`${base}/api/story`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ topic: "A young village inventor", style: "cinematic" })
@@ -74,7 +74,7 @@ test("story API integration checks", async (t) => {
       }), { status: 200, headers: { "content-type": "application/json" } });
     };
 
-    const response = await fetch(`${base}/api/story`, {
+    const response = await originalFetch(`${base}/api/story`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ topic: "A village inventor" })
@@ -87,7 +87,7 @@ test("story API integration checks", async (t) => {
 
   await t.test("unsupported provider returns a clear error", async () => {
     process.env.AI_PROVIDER = "unknown";
-    const response = await fetch(`${base}/api/story`, {
+    const response = await originalFetch(`${base}/api/story`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ topic: "A short story" })
