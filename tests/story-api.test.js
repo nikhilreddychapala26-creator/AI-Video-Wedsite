@@ -66,7 +66,7 @@ test("story API integration checks", async (t) => {
       assert.equal(String(url), "http://127.0.0.1:11434/api/chat");
       assert.equal(options.method, "POST");
       const body = JSON.parse(options.body);
-      assert.equal(body.model, "llama3.2:3b");
+      assert.equal(body.model, "tinyllama");
       assert.equal(body.stream, false);
       assert.equal(body.messages[0].role, "user");
       return new Response(JSON.stringify({
