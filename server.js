@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const OLLAMA_BASE_URL = (process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(/\/+$/, "");
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.2:3b";
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "tinyllama";
 const getAiProvider = () => (process.env.AI_PROVIDER || "gemini").toLowerCase();
 
 app.use(express.json({ limit: "2mb" }));
