@@ -4,10 +4,10 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const AI_PROVIDER = (process.env.AI_PROVIDER || "gemini").toLowerCase();
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const OLLAMA_BASE_URL = (process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(/\\/+$/, "");
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.2:3b";
+const getAiProvider = () => (process.env.AI_PROVIDER || "gemini").toLowerCase();
 
 app.use(express.json({ limit: "2mb" }));
 app.use(express.static(__dirname));
@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
-    res.json({ ok: true, service: "AI Video Studio", provider: AI_PROVIDER });
+    res.json({ ok: true, service: "AI Video Studio", provider: getAiProvider() });
 });
 
 function buildStoryPrompt(topic, style) {
@@ -86,13 +86,14 @@ app.post("/api/story", async (req, res) => {
         return res.status(413).json({ error: "Story topic is too long. Keep it under 12,000 characters." });
     }
 
+    const provider = getAiProvider();
     const prompt = buildStoryPrompt(topic, style || "cinematic");
 
     try {
         let story;
-        if (AI_PROVIDER === "ollama") {
+        if (provider === "ollama") {
             story = await generateWithOllama(prompt);
-        } else if (AI_PROVIDER === "gemini") {
+        } else if (provider === "gemini") {
             story = await generateWithGemini(prompt);
         } else {
             return res.status(500).json({ error: "Unsupported AI_PROVIDER. Set it to 'ollama' or 'gemini'." });
@@ -101,9 +102,9 @@ app.post("/api/story", async (req, res) => {
         if (!story) {
             return res.status(502).json({ error: "The AI provider returned an empty story." });
         }
-        return res.json({ story, provider: AI_PROVIDER });
+        return res.json({ story, provider });
     } catch (error) {
-        console.error(`${AI_PROVIDER} story generation error:`, error);
+        console.error(`${provider} story generation error:`, error);
         return res.status(error.status || 502).json({
             error: error.message || "Story generation failed. Check the server logs."
         });
@@ -113,7 +114,7 @@ app.post("/api/story", async (req, res) => {
 if (require.main === module) {
     app.listen(PORT, () => {
         console.log(`AI Video Studio server running at http://localhost:${PORT}`);
-        console.log(`Story AI provider: ${AI_PROVIDER}`);
+        console.log(`Story AI provider: ${getAiProvider()}`);
     });
 }
 
