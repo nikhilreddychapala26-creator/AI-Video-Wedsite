@@ -13,7 +13,7 @@ button:disabled{opacity:.6;cursor:wait}.actions{display:flex;gap:10px;flex-wrap:
 #status{min-height:24px;color:#405276;line-height:1.5}.hint{color:#65718a;line-height:1.5}
 #characters{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:18px}
 .character{border:1px solid #d8e0ef;border-radius:12px;padding:15px;background:#f8faff}
-.character h3{margin:0 0 6px}.character p{line-height:1.45;margin:6px 0}.character img{display:none;width:100%;height:190px;object-fit:contain;background:#edf1f8;border-radius:8px;margin-top:10px}
+.character h3{margin:0 0 6px}.character p{line-height:1.45;margin:6px 0}.character img{display:none;width:100%;height:190px;object-fit:contain;background:#edf1f8;border-radius:8px;margin-top:10px}.character img[src]{display:block}.upload-status{font-size:13px;color:#405276;min-height:18px}
 .small{font-size:13px;color:#65718a}
 </style></head>
 <body><main>
@@ -38,6 +38,14 @@ button:disabled{opacity:.6;cursor:wait}.actions{display:flex;gap:10px;flex-wrap:
 <script>
 const story=document.getElementById("story"),list=document.getElementById("characters"),status=document.getElementById("status"),createBtn=document.getElementById("createBtn");
 const saved=localStorage.getItem("videoStory");if(saved)story.value=saved;
+function saveCharacterProfiles(){
+ const profiles=[...list.querySelectorAll(".character")].map(card=>{
+  const f=[...card.querySelectorAll("input:not([type=file]),textarea")];
+  return {name:f[0]?.value||"",role:f[1]?.value||"",age:f[2]?.value||"",appearance:f[3]?.value||"",clothing:f[4]?.value||"",personality:f[5]?.value||"",referenceImage:card.dataset.referenceImage||""};
+ });
+ try{localStorage.setItem("videoCharacters",JSON.stringify(profiles));}
+ catch{status.textContent="Character data is too large for browser storage. Use a smaller reference image.";}
+}
 function addCharacter(c={}) {
  const card=document.createElement("article");card.className="character";
  const name=document.createElement("input");name.placeholder="Character name";name.value=c.name||"";
@@ -46,15 +54,31 @@ function addCharacter(c={}) {
  const appearance=document.createElement("textarea");appearance.placeholder="Appearance and visual identity";appearance.value=c.appearance||"";
  const clothing=document.createElement("textarea");clothing.placeholder="Clothing and accessories";clothing.value=c.clothing||"";
  const personality=document.createElement("textarea");personality.placeholder="Personality";personality.value=c.personality||"";
- const upload=document.createElement("input");upload.type="file";upload.accept="image/*";
+ const upload=document.createElement("input");upload.type="file";upload.accept="image/png,image/jpeg,image/webp";
  const img=document.createElement("img");img.alt="Character reference preview";
- upload.addEventListener("change",()=>{const f=upload.files&&upload.files[0];if(!f)return;if(!f.type.startsWith("image/")){status.textContent="Choose a valid image file.";upload.value="";return;}img.src=URL.createObjectURL(f);img.style.display="block";});
+ const uploadStatus=document.createElement("p");uploadStatus.className="upload-status";uploadStatus.setAttribute("role","status");
+ if(c.referenceImage){img.src=c.referenceImage;img.style.display="block";card.dataset.referenceImage=c.referenceImage;}
+ upload.addEventListener("change",async()=>{const f=upload.files&&upload.files[0];if(!f)return;
+  if(!["image/png","image/jpeg","image/webp"].includes(f.type)){uploadStatus.textContent="Use a PNG, JPEG, or WebP image.";upload.value="";return;}
+  if(f.size>1024*1024){uploadStatus.textContent="Image must be 1 MB or smaller.";upload.value="";return;}
+  upload.disabled=true;uploadStatus.textContent="Uploading image to the server...";
+  try{
+   const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error("Could not read the image."));reader.readAsDataURL(f);});
+   const response=await fetch("/api/reference-image",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:dataUrl})});
+   const result=await response.json().catch(()=>({}));
+   if(!response.ok)throw new Error(result.error||"Upload failed (HTTP "+response.status+").");
+   img.src=result.image;img.style.display="block";card.dataset.referenceImage=result.image;
+   uploadStatus.textContent="Image validated by server and saved with this character in this browser.";
+   saveCharacterProfiles();
+  }catch(error){uploadStatus.textContent="Upload failed: "+error.message;}
+  finally{upload.disabled=false;}
+ });
  const title=document.createElement("h3");title.textContent=c.name||"New Character";
  name.addEventListener("input",()=>title.textContent=name.value||"New Character");
  const remove=document.createElement("button");remove.type="button";remove.textContent="Remove Character";remove.addEventListener("click",()=>card.remove());
  card.append(title,name,role,age,appearance,clothing,personality);
  const lab=document.createElement("p");lab.className="small";lab.textContent="Optional reference image (preview only)";
- card.append(lab,upload,img,remove);list.append(card);
+ card.append(lab,upload,uploadStatus,img,remove);list.append(card);
 }
 document.getElementById("addBtn").addEventListener("click",()=>addCharacter());
 createBtn.addEventListener("click",async()=>{
@@ -66,7 +90,7 @@ createBtn.addEventListener("click",async()=>{
   const data=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(data.error||"Character creation failed (HTTP "+response.status+").");
   list.replaceChildren();data.characters.forEach(addCharacter);
-  localStorage.setItem("videoStory",topic);localStorage.setItem("videoCharacters",JSON.stringify(data.characters));
+  localStorage.setItem("videoStory",topic);saveCharacterProfiles();
   status.textContent="Created "+data.characters.length+" story-specific character profiles. Edit them or add more below.";
  }catch(e){status.textContent="Character creation failed: "+e.message;}
  finally{createBtn.disabled=false;createBtn.textContent="Create Characters from My Story";}
