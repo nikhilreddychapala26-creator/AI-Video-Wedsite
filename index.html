@@ -75,9 +75,10 @@ function addCharacter(c={}) {
  });
  const title=document.createElement("h3");title.textContent=c.name||"New Character";
  name.addEventListener("input",()=>title.textContent=name.value||"New Character");
- const remove=document.createElement("button");remove.type="button";remove.textContent="Remove Character";remove.addEventListener("click",()=>card.remove());
+ const remove=document.createElement("button");remove.type="button";remove.textContent="Remove Character";remove.addEventListener("click",()=>{card.remove();saveCharacterProfiles();});
  card.append(title,name,role,age,appearance,clothing,personality);
- const lab=document.createElement("p");lab.className="small";lab.textContent="Optional reference image (preview only)";
+ [name,role,age,appearance,clothing,personality].forEach(field=>field.addEventListener("input",saveCharacterProfiles));
+ const lab=document.createElement("p");lab.className="small";lab.textContent="Optional character reference image (PNG, JPEG, or WebP; max 1 MB)";
  card.append(lab,upload,uploadStatus,img,remove);list.append(card);
 }
 document.getElementById("addBtn").addEventListener("click",()=>addCharacter());
